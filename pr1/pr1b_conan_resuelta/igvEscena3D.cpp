@@ -76,7 +76,82 @@ void igvEscena3D::pintar_casa ()
    glPopMatrix ();
 }
 
-// metodos publico
+
+void igvEscena3D::pintar_robot ()
+{
+   GLUquadricObj *q = gluNewQuadric ();   // cuádrica para el cilindro de la antena
+
+   // ---------------- CUERPO ----------------
+   color ( 0.6, 0.6, 0.65 );              // gris
+   glPushMatrix ();
+      glScalef ( 0.7, 0.8, 0.4 );         // cubo aplastado: ancho 0.7, alto 0.8, fondo 0.4
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+
+   // ---------------- CABEZA ----------------
+   color ( 0.8, 0.8, 0.85 );              // gris claro
+   glPushMatrix ();
+      glTranslatef ( 0, 0.6, 0 );         // encima del cuerpo
+      glScalef ( 0.4, 0.35, 0.35 );
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+
+   // ---------------- OJOS ----------------
+   color ( 0.9, 0.1, 0.1 );               // rojo
+   glPushMatrix ();
+      glTranslatef ( -0.1, 0.65, 0.18 );  // ojo izquierdo, en la cara frontal de la cabeza
+      glScalef ( 0.08, 0.08, 0.05 );
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+   glPushMatrix ();
+      glTranslatef ( 0.1, 0.65, 0.18 );   // ojo derecho (X con signo contrario)
+      glScalef ( 0.08, 0.08, 0.05 );
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+
+   // ---------------- ANTENA ----------------
+   color ( 0.6, 0.6, 0.65 );
+   glPushMatrix ();
+      glTranslatef ( 0, 0.775, 0 );       // sobre la parte alta de la cabeza
+      glRotatef ( -90, 1, 0, 0 );         // el cilindro crece hacia arriba
+      gluCylinder ( q, 0.03, 0.03, 0.25, 10, 2 );
+   glPopMatrix ();
+
+   color ( 0.9, 0.1, 0.1 );               // bola roja en la punta
+   glPushMatrix ();
+      glTranslatef ( 0, 1.05, 0 );
+      glutSolidSphere ( 0.06, 12, 12 );
+   glPopMatrix ();
+
+   // ---------------- BRAZOS ----------------
+   color ( 0.2, 0.3, 0.8 );               // azul
+   glPushMatrix ();
+      glTranslatef ( -0.5, 0, 0 );        // brazo izquierdo, pegado al lateral del cuerpo
+      glScalef ( 0.15, 0.6, 0.15 );
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+   glPushMatrix ();
+      glTranslatef ( 0.5, 0, 0 );         // brazo derecho
+      glScalef ( 0.15, 0.6, 0.15 );
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+
+   // ---------------- PIERNAS ----------------
+   glPushMatrix ();
+      glTranslatef ( -0.18, -0.65, 0 );   // pierna izquierda, debajo del cuerpo
+      glScalef ( 0.2, 0.5, 0.2 );
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+   glPushMatrix ();
+      glTranslatef ( 0.18, -0.65, 0 );    // pierna derecha
+      glScalef ( 0.2, 0.5, 0.2 );
+      glutSolidCube ( 1 );
+   glPopMatrix ();
+
+   gluDeleteQuadric ( q );
+}
+
+// metodos publicos
 
 /**
  * M�todo con las llamadas OpenGL para visualizar la escena
@@ -96,6 +171,11 @@ void igvEscena3D::visualizar(void)
 
    // --- se pintan los objetos de la escena ---
    pintar_casa ();   // dibuja la casa en el origen
+
+   glPushMatrix ();
+      glTranslatef ( 2, 0, 0 );
+      pintar_robot ();
+   glPopMatrix ();
 
    glPopMatrix (); // restaura la matriz de modelado
 }

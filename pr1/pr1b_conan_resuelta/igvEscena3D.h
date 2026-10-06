@@ -19,6 +19,8 @@ class igvEscena3D
       // Atributos
     bool ejes = true;   ///< Indica si hay que dibujar los _ejes coordenados o no
     void pintar_casa();
+    void pintar_robot();
+    void color ( float r, float g, float b ); // para fijar el color del material
 
    public:
       // Constructores por defecto y destructor
