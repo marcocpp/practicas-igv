@@ -151,6 +151,41 @@ void igvEscena3D::pintar_robot ()
    gluDeleteQuadric ( q );
 }
 
+void igvEscena3D::pintar_arbol()
+{
+   GLUquadricObj *q = gluNewQuadric (); // para el cono
+
+
+   // ---------------- TRONCO ----------------
+   color( 0.4, 0.2, 0.05 );
+   glPushMatrix();
+      glTranslatef(0,-1,0); // la base del cilintro se coloca en y = -1
+      glRotatef(-90, 1, 0, 0);
+      gluCylinder(q, 0.12, 0.12, 0.8, 20, 5 );
+   glPopMatrix();
+   // ---------------- CONO INFERIOR ----------------
+   color(0,0.35, 0.1);
+   glPushMatrix();
+      glTranslatef(0, -0.5, 0);
+      glRotatef(-90, 1, 0, 0);
+      glutSolidCone ( 0.6, 0.8, 20, 5 );
+   glPopMatrix();
+
+   // ---------------- CONO MEDIO ----------------
+   glPushMatrix();
+      glTranslatef(0, 0, 0);
+      glRotatef(-90, 1, 0, 0);
+      glutSolidCone ( 0.4, 0.6, 20, 5 );
+   glPopMatrix();
+
+   // ---------------- CONO SUPERIOR ----------------
+   glPushMatrix();
+      glTranslatef(0, 0.4, 0);
+      glRotatef(-90, 1, 0, 0);
+      glutSolidCone ( 0.2, 0.4, 20, 5 );
+   glPopMatrix();
+}
+
 // metodos publicos
 
 /**
@@ -175,6 +210,11 @@ void igvEscena3D::visualizar(void)
    glPushMatrix ();
       glTranslatef ( 2, 0, 0 );
       pintar_robot ();
+   glPopMatrix ();
+
+   glPushMatrix ();
+      glTranslatef ( -2, 0, 0 );
+      pintar_arbol();
    glPopMatrix ();
 
    glPopMatrix (); // restaura la matriz de modelado
