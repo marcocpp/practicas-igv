@@ -66,7 +66,7 @@ igvInterfaz::configura_entorno(int argc, char **argv, int _ancho_ventana, int _a
     glutCreateWindow(_titulo.c_str());
 
     glEnable(GL_DEPTH_TEST); // activa el ocultamiento de superficies por z-buffer
-    glClearColor(1.0, 1.0, 1.0, 0.0); // establece el color de fondo de la ventana
+    glClearColor(0.15, 0.15, 0.17, 1.0); // establece el color de fondo de la ventana
 
     glEnable(GL_LIGHTING); // activa la iluminacion de la escena
     glEnable(GL_NORMALIZE); // normaliza los vectores normales para calculo iluminacion
