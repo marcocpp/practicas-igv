@@ -2,3 +2,6 @@
 *.o
 cmake-build-*/
 .idea/
+pr1a_conan/
+pr1a_conan_resuelta/
+pr1b_conan/
