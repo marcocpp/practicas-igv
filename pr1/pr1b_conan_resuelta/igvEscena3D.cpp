@@ -30,27 +30,25 @@ void igvEscena3D::pintar_ejes()
    glEnd ();
 }
 
-/**
- * M�todo para pintar un tubo utilizando cu�dricas GLU
- */
 
+void igvEscena3D::color ( float r, float g, float b )
+{  GLfloat c[] = { r, g, b, 1.0 };
+   GLfloat nada[] = { 0, 0, 0, 1.0 };
+   glMaterialfv ( GL_FRONT, GL_AMBIENT_AND_DIFFUSE, c );
+   glMaterialfv ( GL_FRONT, GL_EMISSION, nada );   // sin emisión: el color solo depende de la luz
+}
 
 void igvEscena3D::pintar_casa ()
 {
-   // Variable para el color de cada parte.
-   GLfloat color[4];
-
-   // ---------------- CUERPO ----------------
-   color[0] = 0.1; color[1] = 0.1; color[2] = 0.7; color[3] = 1.0;
-   glMaterialfv ( GL_FRONT, GL_EMISSION, color );
+   // ---------------- CUERPO ---------------
+   color(0.1,0.1, 0.7);
 
    glPushMatrix ();              // guarda la matriz: lo que hagamos no afecta a otras partes
       glutSolidCube ( 1 );       // cubo de lado 1, ya centrado en el origen
    glPopMatrix ();               // restaura la matriz
 
    // ---------------- TEJADO ----------------
-   color[0] = 0.7; color[1] = 0.1; color[2] = 0.1;
-   glMaterialfv ( GL_FRONT, GL_EMISSION, color );
+   color(0.7,0.1, 0.1);
 
    glPushMatrix ();
       glTranslatef ( 0, 0.5, 0 );          // sube hasta la cara superior del cubo (Y = 0.5)
@@ -60,8 +58,7 @@ void igvEscena3D::pintar_casa ()
    glPopMatrix ();
 
    // ---------------- PUERTA ----------------
-   color[0] = 0.3; color[1] = 0.7; color[2] = 0.05;
-   glMaterialfv ( GL_FRONT, GL_EMISSION, color );
+   color(0.3,0.7, 0.05);
 
    glPushMatrix ();
       glTranslatef ( 0, -0.25, 0.51 );     // cara frontal (Z = 0.5) + 0.01 para evitar parpadeo
@@ -70,8 +67,7 @@ void igvEscena3D::pintar_casa ()
    glPopMatrix ();
 
    // ---------------- VENTANA ----------------
-   color[0] = 0.6; color[1] = 0.8; color[2] = 1.0;                   // azul claro
-   glMaterialfv ( GL_FRONT, GL_EMISSION, color );
+   color(0.6,0.8, 1.0);
 
    glPushMatrix ();
       glTranslatef ( 0.3, 0.1, 0.51 );     // a la derecha de la puerta y un poco arriba
