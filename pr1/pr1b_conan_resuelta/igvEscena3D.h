@@ -15,32 +15,32 @@
  * Los objetos de esta clase representan escenas 3D para su visualizaci�n
  */
 class igvEscena3D
-{  private:
-      // Atributos
-    bool ejes = true;   ///< Indica si hay que dibujar los _ejes coordenados o no
+{
+private:
+    // Atributos
+    bool ejes = true; ///< Indica si hay que dibujar los _ejes coordenados o no
     void pintar_casa();
     void pintar_robot();
     void pintar_arbol();
-    void color ( float r, float g, float b ); // para fijar el color del material
+    void color(float r, float g, float b); // para fijar el color del material
+    int objetoSel = 0;
 
-   public:
-      // Constructores por defecto y destructor
-      /// Constructor por defecto
-      igvEscena3D () = default;
-      /// Destructor
-      ~igvEscena3D () = default;
+public:
+    igvEscena3D() = default;
+    ~igvEscena3D() = default;
 
-      // M�todos
-      // m�todo con las llamadas OpenGL para visualizar la escena
-      void visualizar ();
+    void seleccionar(int i);
 
-      bool get_ejes ();
+    // m�todo con las llamadas OpenGL para visualizar la escena
+    void visualizar();
 
-      void set_ejes ( bool _ejes );
+    bool get_ejes();
 
-   private:
-      void pintar_tubo ();
-      void pintar_ejes ();
+    void set_ejes(bool _ejes);
+
+private:
+    void pintar_tubo();
+    void pintar_ejes();
 };
 
 #endif   // __IGVESCENA3D
