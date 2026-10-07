@@ -25,11 +25,21 @@ private:
     void color(float r, float g, float b); // para fijar el color del material
     int objetoSel = 0;
 
+    // Transformaciones acumuladas, una por objeto
+    double tx[3] = {0, 0, 0}, ty[3] = {0, 0, 0}, tz[3] = {0, 0, 0};   // traslación
+    double rx[3] = {0, 0, 0}, ry[3] = {0, 0, 0}, rz[3] = {0, 0, 0};   // rotación (grados)
+    double esc[3] = {1, 1, 1};                                        // escala (empieza en 1, no en 0)
+
+    void aplicar_transformaciones ( int i );
+
 public:
     igvEscena3D() = default;
     ~igvEscena3D() = default;
 
     void seleccionar(int i);
+    void trasladar ( double dx, double dy, double dz );
+    void rotar ( double ax, double ay, double az );
+    void escalar ( double factor );
 
     // m�todo con las llamadas OpenGL para visualizar la escena
     void visualizar();

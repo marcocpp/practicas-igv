@@ -129,13 +129,13 @@ void igvEscena3D::pintar_robot()
     // ---------------- BRAZOS ----------------
     color(0.2, 0.3, 0.8); // azul
     glPushMatrix();
-        glTranslatef(-0.5, 0, 0); // brazo izquierdo, pegado al lateral del cuerpo
+        glTranslatef(-0.4, 0, 0); // brazo izquierdo, pegado al lateral del cuerpo
         glScalef(0.15, 0.6, 0.15);
         glutSolidCube(1);
     glPopMatrix();
 
     glPushMatrix();
-        glTranslatef(0.5, 0, 0); // brazo derecho
+        glTranslatef(0.4, 0, 0); // brazo derecho
         glScalef(0.15, 0.6, 0.15);
         glutSolidCube(1);
     glPopMatrix();
@@ -212,17 +212,14 @@ void igvEscena3D::visualizar(void)
     }
 
     // --- se pintan los objetos de la escena ---
-    pintar_casa(); // dibuja la casa en el origen
-
-    glPushMatrix();
-        glTranslatef(2, 0, 0);
-        pintar_robot();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(-2, 0, 0);
-        pintar_arbol();
-    glPopMatrix();
+    for ( int i = 0; i < 3; i++ )
+    {  glPushMatrix ();                 // guarda la matriz para que cada objeto sea independiente
+        aplicar_transformaciones ( i );   // le aplica SUS transformaciones
+        if ( i == 0 ) pintar_casa ();
+        if ( i == 1 ) pintar_arbol ();
+        if ( i == 2 ) pintar_robot ();
+        glPopMatrix ();                  // restaura
+    }
 
     glPopMatrix(); // restaura la matriz de modelado
 }
@@ -254,4 +251,30 @@ void igvEscena3D::seleccionar(int i)
     {
         objetoSel = i;
     }
+}
+
+// La traslación y la rotación se SUMAN
+void igvEscena3D::trasladar ( double dx, double dy, double dz )
+{  tx[objetoSel] += dx;
+    ty[objetoSel] += dy;
+    tz[objetoSel] += dz;
+}
+
+void igvEscena3D::rotar ( double ax, double ay, double az )
+{  rx[objetoSel] += ax;
+    ry[objetoSel] += ay;
+    rz[objetoSel] += az;
+}
+
+// La escala se MULTIPLICA
+void igvEscena3D::escalar ( double factor )
+{  esc[objetoSel] *= factor;
+}
+
+void igvEscena3D::aplicar_transformaciones ( int i )
+{  glTranslatef ( tx[i], ty[i], tz[i] );        // T: se aplica la última
+    glScalef ( esc[i], esc[i], esc[i] );         // S
+    glRotatef ( rx[i], 1, 0, 0 );                // R: se aplica la primera
+    glRotatef ( ry[i], 0, 1, 0 );
+    glRotatef ( rz[i], 0, 0, 1 );
 }

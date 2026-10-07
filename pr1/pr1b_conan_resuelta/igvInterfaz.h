@@ -17,21 +17,23 @@
 #include "igvCamara.h"
 
 /// Vistas can�nicas
-enum Vista {
-    PLANTA   ///< Vista de planta (c�mara en el eje Y)
-    , ALZADO   ///< Vista de alzado (c�mara en el eje Z)
-    , PERFIL   ///< Vista de perfil (c�mara en el eje X)
-    , OTRA   ///< Otro tipo de vista
+enum Vista
+{
+    PLANTA ///< Vista de planta (c�mara en el eje Y)
+    , ALZADO ///< Vista de alzado (c�mara en el eje Z)
+    , PERFIL ///< Vista de perfil (c�mara en el eje X)
+    , OTRA ///< Otro tipo de vista
 };
 
 /**
  * Los objetos de esta clase encapsulan la interfaz y el estado de la aplicaci�n
  */
-class igvInterfaz {
+class igvInterfaz
+{
 private:
     // Atributos
     int ancho_ventana = 0; ///< Ancho de la ventana de visualizaci�n
-    int alto_ventana = 0;  ///< Alto de la ventana de visualizaci�n
+    int alto_ventana = 0; ///< Alto de la ventana de visualizaci�n
     int pos;
     bool cambioVentana;
 
@@ -40,17 +42,18 @@ private:
 
     // Valores de la vista panor�mica
     igvPunto3D p0 = {0, 0, 0} ///< Posici�n de la c�mara
-    , r = {0, 0, 0} ///< Punto de referencia para las vistas
-    , V = {0, 0, 0} ///< Vector que indica la vertical en la vista
+               , r = {0, 0, 0} ///< Punto de referencia para las vistas
+               , V = {0, 0, 0} ///< Vector que indica la vertical en la vista
     ;
 
     // Aplicaci�n del patr�n Singleton
-    static igvInterfaz *_instancia;   ///< Puntero al objeto �nico de la clase
+    static igvInterfaz* _instancia; ///< Puntero al objeto �nico de la clase
     /// Constructor por defecto
     igvInterfaz() = default;
 
 public:
-    static igvInterfaz &getInstancia();
+    static igvInterfaz& getInstancia();
+    static void specialFunc(int key, int x, int y);
 
     /// Destructor
     ~igvInterfaz() = default;
@@ -68,10 +71,10 @@ public:
     void crear_mundo();
 
     // inicializa todos los par�metros para crear una ventana de visualizaci�n
-    void configura_entorno(int argc, char **argv // par�metros del main
-            , int _ancho_ventana, int _alto_ventana // ancho y alto de la ventana de visualizaci�n
-            , int _pos_X, int _pos_Y // posici�n inicial de la ventana de visualizaci�n
-            , std::string _titulo // t�tulo de la ventana de visualizaci�n
+    void configura_entorno(int argc, char** argv // par�metros del main
+                           , int _ancho_ventana, int _alto_ventana // ancho y alto de la ventana de visualizaci�n
+                           , int _pos_X, int _pos_Y // posici�n inicial de la ventana de visualizaci�n
+                           , std::string _titulo // t�tulo de la ventana de visualizaci�n
     );
 
     void inicializa_callbacks(); // inicializa todos los callbacks
