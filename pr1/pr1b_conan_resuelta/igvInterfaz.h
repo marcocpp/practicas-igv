@@ -34,8 +34,7 @@ private:
     // Atributos
     int ancho_ventana = 0; ///< Ancho de la ventana de visualizaci�n
     int alto_ventana = 0; ///< Alto de la ventana de visualizaci�n
-    int pos;
-    bool cambioVentana;
+    bool modoCamara = false;
 
     igvEscena3D escena; ///< Escena que se visualiza en la ventana definida por igvInterfaz
     igvCamara camara; ///< C�mara que se utiliza para visualizar la escena
@@ -50,6 +49,12 @@ private:
     static igvInterfaz* _instancia; ///< Puntero al objeto �nico de la clase
     /// Constructor por defecto
     igvInterfaz() = default;
+    igvCamara camaraPlanta;   ///< Cámara cenital para el recuadro superpuesto
+    igvCamara camaraAlzado;   ///< Cámara para la vista de alzado
+    igvCamara camaraPerfil;   ///< Cámara para la vista de perfil
+
+    bool cuatroVistas = false; ///< Activa o desactiva el modo 4 viewports
+    int vistaActual = 0;       ///< 0: Panorámica, 1: Planta, 2: Alzado, 3: Perfil
 
 public:
     static igvInterfaz& getInstancia();
@@ -90,7 +95,6 @@ public:
 
     void set_alto_ventana(int _alto_ventana);
 
-    void actualizar_vista_camara(int pos);
 };
 
 #endif   // __IGVINTERFAZ

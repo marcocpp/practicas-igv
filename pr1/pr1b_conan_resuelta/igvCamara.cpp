@@ -200,3 +200,77 @@ void igvCamara::setZnear(GLdouble znear) {
 void igvCamara::setZfar(GLdouble zfar) {
     igvCamara::zfar = zfar;
 }
+/**
+ * Mueve el plano delantero del volumen de visión.
+ * @param incremento Positivo: se aleja de la cámara (hacia delante). Negativo: se acerca.
+ * @post znear se mantiene siempre >= 0.1 y menor que zfar (si no, el cambio se ignora)
+ */
+void igvCamara::moverPlanoDelantero(double incremento) {
+    double nuevo = znear + incremento;
+    if (nuevo >= 0.1 && nuevo < zfar - 0.1) {
+        znear = nuevo;
+    }
+}
+
+/**
+ * Mueve el plano trasero del volumen de visión.
+ * @param incremento Positivo: se aleja de la cámara. Negativo: se acerca.
+ * @post zfar se mantiene siempre mayor que znear (si no, el cambio se ignora)
+ */
+void igvCamara::moverPlanoTrasero(double incremento) {
+    double nuevo = zfar + incremento;
+    if (nuevo > znear + 0.1) {
+        zfar = nuevo;
+    }
+}
+
+/**
+ * Recalcula distancia, azimut y elevación a partir de la posición actual P0.
+ * Hay que llamarlo cada vez que se cambie P0 con set(...).
+ */
+void igvCamara::sincronizarOrbita() {
+    double x = P0[X], y = P0[Y], z = P0[Z];
+    distancia = sqrt(x * x + y * y + z * z);
+    azimut = atan2(x, z) * 180.0 / M_PI;
+    elevacion = asin(y / distancia) * 180.0 / M_PI;
+}
+
+/**
+ * Mueve la cámara en órbita alrededor del origen.
+ * @param dAzimut Incremento del ángulo horizontal (grados)
+ * @param dElevacion Incremento del ángulo vertical (grados)
+ * @post La elevación se limita a ±89° para que el vector arriba no se degenere
+ */
+void igvCamara::orbitar(double dAzimut, double dElevacion) {
+    azimut += dAzimut;
+    elevacion += dElevacion;
+    if (elevacion > 89) elevacion = 89;
+    if (elevacion < -89) elevacion = -89;
+
+    double a = azimut * M_PI / 180.0;
+    double e = elevacion * M_PI / 180.0;
+
+    P0.set(distancia * cos(e) * sin(a),
+           distancia * sin(e),
+           distancia * cos(e) * cos(a));
+    r.set(0, 0, 0);   // la órbita siempre mira al origen
+}
+
+/**
+ * Rota la cámara sobre su propio eje Y (paneo).
+ * @param angulo Incremento del ángulo en grados.
+ */
+void igvCamara::pan(double angulo) {
+    double rad = angulo * M_PI / 180.0;
+
+    // Vector de dirección de la cámara en el plano XZ
+    double dx = r[X] - P0[X];
+    double dz = r[Z] - P0[Z];
+
+    // Rotar el vector de dirección usando matriz de rotación 2D
+    double nuevo_dx = dx * cos(rad) - dz * sin(rad);
+    double nuevo_dz = dx * sin(rad) + dz * cos(rad);
+
+    // Actualizar el punto de referencia r
+    r.set(P0[X] + nuevo_dx, r[Y], P0[Z] + nuevo_dz);
+}

@@ -37,6 +37,19 @@ void igvInterfaz::crear_mundo()
 
     // Las c�maras se han creado con valores por defecto de 60 grados de apertura
     // y ratio de aspecto 1
+    // Cámara de planta: sobre el eje Y, mirando al origen, paralela.
+    // El vector arriba es (0,0,-1) porque (0,1,0) coincide con la dirección de visión.
+    camaraPlanta.set(IGV_PARALELA, igvPunto3D(0, 10, 0), igvPunto3D(0, 0, 0), igvPunto3D(0, 0, -1),
+                     -3, 3, -3, 3, 1, 200);
+
+    // Cámara de alzado: sobre el eje Z
+    camaraAlzado.set(IGV_PARALELA, igvPunto3D(0, 0, 10), igvPunto3D(0, 0, 0), igvPunto3D(0, 1, 0),
+                     -3, 3, -3, 3, 1, 200);
+
+    // Cámara de perfil: sobre el eje X
+    camaraPerfil.set(IGV_PARALELA, igvPunto3D(10, 0, 0), igvPunto3D(0, 0, 0), igvPunto3D(0, 1, 0),
+                     -3, 3, -3, 3, 1, 200);
+
 }
 
 /**
@@ -61,8 +74,7 @@ igvInterfaz::configura_entorno(int argc, char** argv, int _ancho_ventana, int _a
     // inicializaci�n de los atributos de la interfaz
     ancho_ventana = _ancho_ventana;
     alto_ventana = _alto_ventana;
-    cambioVentana = false;
-    pos = 1;
+
 
     // inicializaci�n de la ventana de visualizaci�n
     glutInit(&argc, argv);
@@ -165,12 +177,6 @@ void igvInterfaz::keyboardFunc(unsigned char key, int x, int y)
         }
         _instancia->camara.aplicar();
         break;
-    case 'v': // cambia la posición de la cámara para mostrar las vistas planta, perfil, alzado o perspectiva
-        _instancia->actualizar_vista_camara(++_instancia->pos % 4);
-        break;
-    case 'V': // cambia la posición de la cámara para mostrar las vistas planta, perfil, alzado o perspectiva
-        _instancia->actualizar_vista_camara(++_instancia->pos % 4);
-        break;
     case '+': // zoom in
         _instancia->camara.zoom(0.95);
         _instancia->camara.aplicar();
@@ -178,18 +184,6 @@ void igvInterfaz::keyboardFunc(unsigned char key, int x, int y)
     case '-': // zoom out
         _instancia->camara.zoom(1.0 / 0.95);
         _instancia->camara.aplicar();
-        break;
-    case 'n': // incrementar la distancia del plano cercano
-        _instancia->camara.setZnear(_instancia->camara.getZnear() + 0.2);
-        _instancia->camara.aplicar();
-        break;
-    case 'N': // decrementar la distancia del plano cercano
-        _instancia->camara.setZnear(_instancia->camara.getZnear() - 0.2);
-        _instancia->camara.aplicar();
-        break;
-    case '4': // dividir la ventana  en cuatro vistas
-        _instancia->cambioVentana = !_instancia->cambioVentana;
-        _instancia->actualizar_vista_camara(0);
         break;
     case 'e': // activa/desactiva la visualizacion de los ejes
         _instancia->escena.set_ejes(_instancia->escena.get_ejes() ? false : true);
@@ -210,9 +204,15 @@ void igvInterfaz::keyboardFunc(unsigned char key, int x, int y)
         break;
     case 'X': _instancia->escena.rotar(-5, 0, 0);
         break;
-    case 'y': _instancia->escena.rotar(0, 5, 0);
-        break;
-    case 'Y': _instancia->escena.rotar(0, -5, 0);
+    case 'y':
+    case 'Y':
+        if (_instancia->modoCamara) {
+            // giro de la cámara sobre el eje Y (paneo)
+            _instancia->camara.pan(key == 'y' ? 5.0 : -5.0);
+            _instancia->camara.aplicar();
+        } else {
+            _instancia->escena.rotar(0, key == 'y' ? 5 : -5, 0);   // rota el objeto
+        }
         break;
     case 'z': _instancia->escena.rotar(0, 0, 5);
         break;
@@ -222,7 +222,61 @@ void igvInterfaz::keyboardFunc(unsigned char key, int x, int y)
         break;
     case 'S': _instancia->escena.escalar(1 / 1.1);
         break;
+    case 'c':
+    case 'C':   // alterna entre mover el objeto y mover la cámara
+        _instancia->modoCamara = !_instancia->modoCamara;
+        break;
+    case 'f':   // plano delantero hacia delante
+        _instancia->camara.moverPlanoDelantero(0.2);
+        _instancia->camara.aplicar();
+        break;
+    case 'F':   // plano delantero hacia atrás
+        _instancia->camara.moverPlanoDelantero(-0.2);
+        _instancia->camara.aplicar();
+        break;
+    case 'b':   // plano trasero hacia atrás
+        _instancia->camara.moverPlanoTrasero(0.2);
+        _instancia->camara.aplicar();
+        break;
+    case 'B':   // plano trasero hacia delante
+        _instancia->camara.moverPlanoTrasero(-0.2);
+        _instancia->camara.aplicar();
+        break;
+    case 'n': // Aleja plano cercano
+        _instancia->camara.moverPlanoDelantero(0.2);
+        _instancia->camara.aplicar();
+        break;
+    case 'N': // Acerca plano cercano
+        _instancia->camara.moverPlanoDelantero(-0.2);
+        _instancia->camara.aplicar();
+        break;
+
+    case '4': // Activa/Desactiva los 4 viewports
+        _instancia->cuatroVistas = !_instancia->cuatroVistas;
+        break;
+    case 'v':
+    case 'V':
+        // Cambia interactivamente entre vistas: panorámica, planta, alzado, perfil
+        _instancia->vistaActual = (_instancia->vistaActual + 1) % 4;
+        switch (_instancia->vistaActual) {
+        case 0: // Panorámica inicial
+            _instancia->camara.set(igvPunto3D(3.0, 2.0, 4.0), igvPunto3D(0,0,0), igvPunto3D(0,1,0));
+            break;
+        case 1: // Planta
+            _instancia->camara.set(igvPunto3D(0, 10, 0), igvPunto3D(0,0,0), igvPunto3D(0,0,-1));
+            break;
+        case 2: // Alzado
+            _instancia->camara.set(igvPunto3D(0, 0, 10), igvPunto3D(0,0,0), igvPunto3D(0,1,0));
+            break;
+        case 3: // Perfil
+            _instancia->camara.set(igvPunto3D(10, 0, 0), igvPunto3D(0,0,0), igvPunto3D(0,1,0));
+            break;
+        }
+        _instancia->camara.sincronizarOrbita(); // recalcula por si orbitamos después
+        _instancia->camara.aplicar();
+        break;
     }
+
     glutPostRedisplay(); // renueva el contenido de la ventana de vision y redibuja la escena
 }
 
@@ -233,53 +287,66 @@ void igvInterfaz::keyboardFunc(unsigned char key, int x, int y)
  * @param h Nuevo alto de la ventana
  * @pre Se asume que todos los par�metros tienen valores v�lidos
  */
-void igvInterfaz::reshapeFunc(int w, int h)
-{
-    // dimensiona el viewport al nuevo ancho y alto de la ventana
-    // guardamos valores nuevos de la ventana de visualizacion
+void igvInterfaz::reshapeFunc(int w, int h) {
     _instancia->set_ancho_ventana(w);
     _instancia->set_alto_ventana(h);
-
-    // establece los par�metros de la c�mara y de la proyecci�n
-    _instancia->camara.aplicar();
 }
 
 /**
  * M�todo para visualizar la escena
  */
-void igvInterfaz::displayFunc()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // borra la ventana y el Z-buffer
+void igvInterfaz::displayFunc() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // se establece el viewport
-    // se establece el viewport
-    if (!_instancia->cambioVentana)
-    {
-        glViewport(0, 0, _instancia->get_ancho_ventana(), _instancia->get_alto_ventana());
-        //visualiza la escena
+    int ancho = _instancia->get_ancho_ventana();
+    int alto = _instancia->get_alto_ventana();
+
+    if (!_instancia->cuatroVistas) {
+        // ---- COMPORTAMIENTO ORIGINAL ----
+        // Vista principal: ocupa toda la ventana
+        glViewport(0, 0, ancho, alto);
+        _instancia->camara.aplicar();
+        _instancia->escena.visualizar();
+
+        // Recuadro de planta: esquina superior derecha, cuadrado
+        int lado = alto / 4;
+        glViewport(ancho - lado, alto - lado, lado, lado);
+
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(ancho - lado, alto - lado, lado, lado);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glDisable(GL_SCISSOR_TEST);
+
+        _instancia->camaraPlanta.aplicar();
+        _instancia->escena.visualizar();
+
+    } else {
+        // ---- COMPORTAMIENTO 4 VISTAS SIMULTÁNEAS ----
+        int mitad_ancho = ancho / 2;
+        int mitad_alto = alto / 2;
+
+        // 1. Superior Izquierda: Planta
+        glViewport(0, mitad_alto, mitad_ancho, mitad_alto);
+        _instancia->camaraPlanta.aplicar();
+        _instancia->escena.visualizar();
+
+        // 2. Superior Derecha: Panorámica
+        glViewport(mitad_ancho, mitad_alto, mitad_ancho, mitad_alto);
+        _instancia->camara.aplicar();
+        _instancia->escena.visualizar();
+
+        // 3. Inferior Izquierda: Alzado
+        glViewport(0, 0, mitad_ancho, mitad_alto);
+        _instancia->camaraAlzado.aplicar();
+        _instancia->escena.visualizar();
+
+        // 4. Inferior Derecha: Perfil
+        glViewport(mitad_ancho, 0, mitad_ancho, mitad_alto);
+        _instancia->camaraPerfil.aplicar();
         _instancia->escena.visualizar();
     }
-    else
-    {
-        glViewport(0, _instancia->get_alto_ventana() / 2, _instancia->get_ancho_ventana() / 2,
-                   _instancia->get_alto_ventana() / 2);
-        _instancia->actualizar_vista_camara(0);
-        _instancia->escena.visualizar();
-        glViewport(_instancia->get_ancho_ventana() / 2, _instancia->get_alto_ventana() / 2,
-                   _instancia->get_ancho_ventana() / 2, _instancia->get_alto_ventana() / 2);
-        _instancia->actualizar_vista_camara(1);
-        _instancia->escena.visualizar();
-        glViewport(0, 0, _instancia->get_ancho_ventana() / 2, _instancia->get_alto_ventana() / 2);
-        _instancia->actualizar_vista_camara(2);
-        _instancia->escena.visualizar();
-        glViewport(_instancia->get_ancho_ventana() / 2, 0, _instancia->get_ancho_ventana() / 2,
-                   _instancia->get_alto_ventana() / 2);
-        _instancia->actualizar_vista_camara(3);
-        _instancia->escena.visualizar();
-    }
 
-    // refresca la ventana
-    glutSwapBuffers(); // se utiliza, en vez de glFlush(), para evitar el parpadeo
+    glutSwapBuffers();
 }
 
 /**
@@ -333,39 +400,26 @@ void igvInterfaz::set_alto_ventana(int _alto_ventana)
     alto_ventana = _alto_ventana;
 }
 
-void igvInterfaz::actualizar_vista_camara(int pos)
-{
-    switch (pos + 1)
-    {
-    case 1:
-        _instancia->camara.set(p0, r, V); //Básico
-        break;
-    case 2:
-        _instancia->camara.set(igvPunto3D(0, 5, 0), igvPunto3D(0, 0, 0), igvPunto3D(1, 0, 0)); //Planta
-        break;
-    case 3:
-        _instancia->camara.set(igvPunto3D(5, 0, 0), igvPunto3D(0, 0, 0), igvPunto3D(0, 1, 0)); //Perfil
-        break;
-    case 4:
-        _instancia->camara.set(igvPunto3D(0, 0, 5), igvPunto3D(0, 0, 0), igvPunto3D(0, 1, 0)); //Alzado
-        break;
-    }
 
-    _instancia->camara.aplicar();
-}
 
 void igvInterfaz::specialFunc(int key, int x, int y)
 {
-    switch (key)
-    {
-    case GLUT_KEY_LEFT: _instancia->escena.trasladar(0.1, 0, 0);
-        break;
-    case GLUT_KEY_RIGHT: _instancia->escena.trasladar(-0.1, 0, 0);
-        break;
-    case GLUT_KEY_UP: _instancia->escena.trasladar(0, 0, 0.1);
-        break;
-    case GLUT_KEY_DOWN: _instancia->escena.trasladar(0, 0, -0.1);
-        break;
+    if (_instancia->modoCamara) {
+        if (_instancia->modoCamara) {
+            switch (key) {
+            case GLUT_KEY_LEFT:  _instancia->camara.orbitar(-5, 0); break;
+            case GLUT_KEY_RIGHT: _instancia->camara.orbitar(5, 0);  break;
+            case GLUT_KEY_UP:    _instancia->camara.orbitar(0, 5);  break;
+            case GLUT_KEY_DOWN:  _instancia->camara.orbitar(0, -5); break;
+            }
+        }
+    } else {
+        switch (key) {
+        case GLUT_KEY_LEFT:  _instancia->escena.trasladar(0.1, 0, 0);  break;
+        case GLUT_KEY_RIGHT: _instancia->escena.trasladar(-0.1, 0, 0); break;
+        case GLUT_KEY_UP:    _instancia->escena.trasladar(0, 0, 0.1);  break;
+        case GLUT_KEY_DOWN:  _instancia->escena.trasladar(0, 0, -0.1); break;
+        }
     }
-    glutPostRedisplay(); // aquí no hay glutPostRedisplay automático
+    glutPostRedisplay();
 }

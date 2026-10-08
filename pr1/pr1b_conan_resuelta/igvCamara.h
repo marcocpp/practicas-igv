@@ -41,11 +41,19 @@ private:
     GLdouble angulo = 60   ///< �ngulo de apertura (proyecci�n perspectiva)
     , raspecto = 1   ///< Raz�n de aspecto (proyecci�n perspectiva)
     ;
+    // Parámetros de la órbita (coordenadas esféricas respecto al origen)
+    double distancia = 5.385;   ///< Distancia al origen: sqrt(3²+2²+4²)
+    double azimut = 36.87;      ///< Ángulo horizontal en grados: atan2(3, 4)
+    double elevacion = 21.8;    ///< Ángulo vertical en grados: asin(2 / distancia)
 public:
     void setZnear(GLdouble znear);
 
     void setZfar(GLdouble zfar);
-
+    void moverPlanoDelantero(double incremento);   // f/F: mueve el plano cercano (znear)
+    void moverPlanoTrasero(double incremento);     // b/B: mueve el plano lejano (zfar)
+    void orbitar(double dAzimut, double dElevacion);   // órbita alrededor del origen
+    void sincronizarOrbita();                          // recalcula distancia/ángulos desde P0
+    void pan(double angulo);
 public:
     tipoCamara getTipo() const;
 
