@@ -4,7 +4,7 @@
 - **Marco Carofiglio Pajares**
 - **José María Valero Palomares**
 
-## Enlace al vídeo: [click aquí](PENDIENTE_ENLACE_GOOGLE_DRIVE)
+## Enlace al vídeo: [click aquí](https://drive.google.com/file/d/1TgO2jE2ODs56DQB8zvXJjESK0jEI6lbb/view?usp=sharing)
 
 > Comprobar que el enlace permite descargar el vídeo a cualquier docente.
 
@@ -285,26 +285,3 @@ Teclas comunes a todos los modos:
 - **Botón derecho**: menú.
 - **Botón izquierdo** (con *Articulaciones → Con raton*): un clic en una parte de la grúa la selecciona y se pone amarilla. Un clic en el fondo, el suelo o la caracola la deselecciona. **Arrastrar** izquierda-derecha mueve la base, gira la pluma, mueve el carro o gira el gancho. Arrastrar arriba-abajo sube y baja el cable o el gancho.
 
----
-
-## Registro del trabajo realizado
-
-1. **Lectura de la documentación**: el enunciado (*Lo que hay que resolver*), las guías de pr2a, pr2b y pr2c, y nuestro código de la P1. Del enunciado tomamos el reparto de clases, el mapa de teclas, la estructura de `visualizar(bool sel)`, la pasada de selección, `idleFunc` con `dt` y los submenús. De las guías, los «detalles a vigilar» de cada solución, que hemos corregido.
-2. **Proyecto de entrega** (`pr2_entrega`), creado a partir de `pr1b_conan_resuelta`. Lleva solo lo que hay que entregar: los `.cpp` y `.h`, `CMakeLists.txt` (proyecto `pr2`) y los ficheros de Conan. No lleva ejecutables ni carpetas de compilación.
-3. **Malla**: `igvMallaTriangulos` de pr2a con las correcciones y `calcular_normales()`. `igvCaracola` nueva. La orientación de los triángulos se comprobó con un programa de prueba independiente.
-4. **Grúa** (`igvGrua`): grafo de escena, cinco grados de libertad con límites (dos de ellos dependientes entre sí), selección por color, teclado, ratón y animación.
-5. **Escena**: los dos modelos con las transformaciones de la P1, el suelo, dos luces (una puntual y una direccional de relleno) y los ejes sin iluminación.
-6. **Cámara**: la de la P1, con la órbita alrededor de `r` y el aspecto por viewport. Se han limpiado los comentarios, que tenían la codificación de caracteres estropeada.
-7. **Interfaz**: modos de teclado y de articulaciones, selección en el viewport del clic, menús con su estado, título con el estado, ayuda en la consola y animación con `dt`.
-8. **Pruebas**: se compila sin errores con el MinGW de CLion y Conan, y con `-Wall -Wextra` solo quedan avisos de parámetros sin usar en los callbacks de GLUT. Se ha ejecutado enviando eventos de teclado y ratón a la ventana:
-   - la selección devuelve la parte correcta (gancho, pluma, base) o *ninguna* en el fondo;
-   - el arrastre gira la pluma y baja el gancho hasta su límite;
-   - el carro se detiene en el radio seguro con la carga baja;
-   - funcionan el resaltado amarillo, el sombreado plano, las cuatro vistas, la perspectiva, la animación y la órbita;
-   - funcionan los cambios de modo, sin cierres inesperados.
-
-### Pendiente antes de entregar
-
-- [ ] Grabar el vídeo, siguiendo la lista de comprobación del enunciado, y poner el enlace al principio de este documento.
-- [ ] Comprobar en CLion que el proyecto abre y compila desde cero.
-- [ ] Hacer el `.zip` con el contenido de `pr2_entrega`, con los nombres de los dos miembros en el nombre del fichero, sin la carpeta `cmake-build-*`.
